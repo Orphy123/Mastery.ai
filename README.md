@@ -15,7 +15,7 @@ Mastery.ai is an intelligent learning companion that transforms how students ove
 ### 1. Ask-&-Learn
 
 <p align="center">
-  <img src="screenshots/search.png" alt="Mastery.ai Logo" width="200"/>
+  <img src="screenshots/search.png" alt="Mastery.ai Logo" width="600"/>
 </p>
 
 - **Instant Explanations**: Type any academic question and receive age-appropriate explanations
@@ -25,7 +25,7 @@ Mastery.ai is an intelligent learning companion that transforms how students ove
 ### 2. Deliberate Practice
 
 <p align="center">
-  <img src="screenshots/practice.png" alt="Mastery.ai Logo" width="200"/>
+  <img src="screenshots/practice.png" alt="Mastery.ai Logo" width="600"/>
 </p>
 
 - **Auto-generated Problems**: Custom practice questions based on your searched concepts
@@ -35,7 +35,7 @@ Mastery.ai is an intelligent learning companion that transforms how students ove
 ### 3. Spaced Review
 
 <p align="center">
-  <img src="screenshots/review.png" alt="Mastery.ai Logo" width="200"/>
+  <img src="screenshots/review.png" alt="Mastery.ai Logo" width="600"/>
 </p>
 
 - **Scientific Retention**: SM-2 algorithm schedules reviews at optimal intervals for long-term memory
@@ -45,7 +45,7 @@ Mastery.ai is an intelligent learning companion that transforms how students ove
 ### 4. Progress Pulse
 
 <p align="center">
-  <img src="screenshots/tracker.gif" alt="Mastery.ai Logo" width="200"/>
+  <img src="screenshots/tracker.gif" alt="Mastery.ai Logo" width="600"/>
 </p>
 
 - **Visual Progress Tracking**: See your learning journey through intuitive charts and graphs
