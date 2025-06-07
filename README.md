@@ -1,7 +1,7 @@
 # Mastery.ai: Intelligent Learning Companion
 
 <p align="center">
-  <img src="screenshots/homepage.gif" alt="Mastery.ai Logo" width="200"/>
+  <img src="screenshots/homepage.gif" alt="Mastery.ai Logo" width="400"/>
 </p>
 
 > Transform moments of confusion into opportunities for mastery
