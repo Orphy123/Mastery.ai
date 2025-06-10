@@ -12,17 +12,39 @@ import Review from './pages/Review';
 import Progress from './pages/Progress';
 import Profile from './pages/Profile';
 import NotFound from './pages/NotFound';
+import ForgotPassword from './pages/ForgotPassword';
+import Chat from './pages/Chat';
 
 // Import contexts
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 
 // Import layout components
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
+import Navbar from './components/Navbar';
 
 // Create context
 export const AppContext = createContext({});
+
+// Protected Route component
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
+  return children;
+};
 
 function App() {
   // Set up app-wide state
@@ -84,11 +106,6 @@ function App() {
     }
   };
 
-  // Private route component
-  const RequireAuth = ({ children }) => {
-    return currentUser ? children : <Navigate to="/login" />;
-  };
-
   // Wait for auth to initialize
   if (!isInitialized) {
     return (
@@ -103,38 +120,44 @@ function App() {
       <ThemeProvider>
         <Router>
           <div className="flex flex-col min-h-screen">
-            <Header />
+            <Navbar />
             <main className="flex-grow container mx-auto px-4 py-8">
               <Routes>
                 {/* Public routes */}
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
                 
                 {/* Protected routes */}
                 <Route path="/search" element={
-                  <RequireAuth>
+                  <ProtectedRoute>
                     <Search />
-                  </RequireAuth>
+                  </ProtectedRoute>
                 } />
                 <Route path="/practice" element={
-                  <RequireAuth>
+                  <ProtectedRoute>
                     <Practice />
-                  </RequireAuth>
+                  </ProtectedRoute>
                 } />
                 <Route path="/review" element={
-                  <RequireAuth>
+                  <ProtectedRoute>
                     <Review />
-                  </RequireAuth>
+                  </ProtectedRoute>
                 } />
                 <Route path="/progress" element={
-                  <RequireAuth>
+                  <ProtectedRoute>
                     <Progress />
-                  </RequireAuth>
+                  </ProtectedRoute>
                 } />
                 <Route path="/profile" element={
-                  <RequireAuth>
+                  <ProtectedRoute>
                     <Profile />
-                  </RequireAuth>
+                  </ProtectedRoute>
+                } />
+                <Route path="/chat" element={
+                  <ProtectedRoute>
+                    <Chat />
+                  </ProtectedRoute>
                 } />
                 
                 {/* 404 route */}

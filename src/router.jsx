@@ -11,6 +11,7 @@ const Progress = lazy(() => import('./pages/Progress'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Login = lazy(() => import('./pages/Login'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+const Chat = lazy(() => import('./components/Chat'));
 
 // Loading fallback
 const PageLoader = () => (
@@ -101,6 +102,16 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<PageLoader />}>
             <Login />
+          </Suspense>
+        )
+      },
+      {
+        path: 'chat',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <RequireAuth>
+              <Chat />
+            </RequireAuth>
           </Suspense>
         )
       },
