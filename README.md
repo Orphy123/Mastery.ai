@@ -173,7 +173,3 @@ Mastery.ai is an intelligent learning companion that transforms how students ove
 - **Advanced Analytics**: Deeper insights into learning patterns
 
 
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
