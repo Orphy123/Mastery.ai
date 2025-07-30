@@ -172,20 +172,8 @@ Mastery.ai is an intelligent learning companion that transforms how students ove
 - **Offline Mode**: Core functionality without internet connection
 - **Advanced Analytics**: Deeper insights into learning patterns
 
-### Future Enhancements
-- **Social Learning Features**: Study groups and peer help
-- **Expanded Content Types**: Interactive simulations and educational games
-- **Educator Dashboard**: Tools for teachers to monitor class progress
-- **LMS Integration**: Connectivity with popular learning management systems
-
 
 ## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgements
-
-- [OpenAI](https://openai.com/) for providing the AI explanation capabilities
-- [YouTube](https://developers.google.com/youtube) for the educational video content
-- All the educators and learners who provided feedback during development
 
