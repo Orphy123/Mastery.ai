@@ -189,8 +189,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [YouTube](https://developers.google.com/youtube) for the educational video content
 - All the educators and learners who provided feedback during development
 
----
-
-<p align="center">
-  Made with ❤️ for learners everywhere
-</p>
