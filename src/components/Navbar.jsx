@@ -56,6 +56,14 @@ function Navbar() {
                 Review
               </Link>
               <Link
+                to="/progress"
+                className={`${
+                  darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-900 hover:text-gray-700'
+                } inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium`}
+              >
+                Progress
+              </Link>
+              <Link
                 to="/chat"
                 className={`${
                   darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-900 hover:text-gray-700'
@@ -187,6 +195,14 @@ function Navbar() {
             } block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium`}
           >
             Review
+          </Link>
+          <Link
+            to="/progress"
+            className={`${
+              darkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-900 hover:bg-gray-50'
+            } block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium`}
+          >
+            Progress
           </Link>
           <Link
             to="/chat"

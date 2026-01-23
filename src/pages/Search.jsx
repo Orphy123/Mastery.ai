@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { generateExplanation } from '../services/openai';
 import { searchVideos, getEmbedUrl } from '../services/youtube';
-import { addToSearchHistory, getSearchHistory } from '../services/storageService';
+import { addToSearchHistory, getSearchHistory, saveReviewItem } from '../services/storageService';
+import { createReviewItem } from '../services/reviewScheduler';
 import { 
   MagnifyingGlassIcon, 
   ArrowPathIcon, 
@@ -11,7 +13,8 @@ import {
   ClockIcon,
   BookmarkIcon,
   LightBulbIcon,
-  QuestionMarkCircleIcon
+  QuestionMarkCircleIcon,
+  CheckIcon
 } from '@heroicons/react/24/outline';
 import ReactMarkdown from 'react-markdown';
 
@@ -23,8 +26,10 @@ function Search() {
   const [selectedGrade, setSelectedGrade] = useState('middle');
   const [recentQueries, setRecentQueries] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const searchInputRef = useRef(null);
   const resultRef = useRef(null);
+  const navigate = useNavigate();
   
   const { currentUser } = useAuth();
   const { darkMode } = useTheme();
@@ -49,6 +54,7 @@ function Search() {
     setIsLoading(true);
     setExplanation('');
     setVideos([]);
+    setIsSaved(false);
     
     try {
       // Record search in history
@@ -98,6 +104,26 @@ function Search() {
         new Event('submit', { cancelable: true, bubbles: true })
       );
     }, 100);
+  };
+
+  // Save current explanation to review items
+  const handleSaveToReview = () => {
+    if (!query || !explanation || isSaved) return;
+    
+    const reviewItem = createReviewItem(
+      query,
+      `What is ${query}?`,
+      selectedGrade
+    );
+    
+    saveReviewItem(reviewItem);
+    setIsSaved(true);
+  };
+
+  // Navigate to practice page with the current topic
+  const handlePractice = () => {
+    if (!query) return;
+    navigate('/practice', { state: { topic: query, difficulty: selectedGrade } });
   };
 
   return (
@@ -248,13 +274,31 @@ function Search() {
                 <div className="mt-6 flex justify-between">
                   <div className="flex space-x-2">
                     <button
-                      className={`flex items-center px-3 py-1 rounded-lg text-xs font-medium ${darkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                      onClick={handleSaveToReview}
+                      disabled={isSaved}
+                      className={`flex items-center px-3 py-1 rounded-lg text-xs font-medium ${
+                        isSaved 
+                          ? 'bg-green-100 text-green-700 cursor-default'
+                          : darkMode 
+                            ? 'bg-gray-700 text-white hover:bg-gray-600' 
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
                       aria-label="Save to review later"
                     >
-                      <BookmarkIcon className="h-4 w-4 mr-1" />
-                      Save
+                      {isSaved ? (
+                        <>
+                          <CheckIcon className="h-4 w-4 mr-1" />
+                          Saved
+                        </>
+                      ) : (
+                        <>
+                          <BookmarkIcon className="h-4 w-4 mr-1" />
+                          Save
+                        </>
+                      )}
                     </button>
                     <button
+                      onClick={handlePractice}
                       className={`flex items-center px-3 py-1 rounded-lg text-xs font-medium ${darkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                       aria-label="Practice this concept"
                     >

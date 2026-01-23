@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { sendMessage } from '../services/openai';
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid';
+import ReactMarkdown from 'react-markdown';
 
 function Chat() {
   const [messages, setMessages] = useState([]);
@@ -19,6 +21,23 @@ function Chat() {
     scrollToBottom();
   }, [messages]);
 
+  // Build conversation history for context
+  const buildConversationContext = (currentInput) => {
+    const recentMessages = messages.slice(-10); // Keep last 10 messages for context
+    let context = "You are Mastery.ai, an intelligent educational assistant that helps students learn. Be helpful, encouraging, and explain concepts clearly. Format responses with markdown when appropriate.\n\n";
+    
+    recentMessages.forEach(msg => {
+      if (msg.role === 'user') {
+        context += `Student: ${msg.content}\n`;
+      } else if (msg.role === 'assistant') {
+        context += `Assistant: ${msg.content}\n`;
+      }
+    });
+    
+    context += `Student: ${currentInput}\nAssistant:`;
+    return context;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -30,39 +49,30 @@ function Chat() {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const currentInput = input;
     setInput('');
     setIsLoading(true);
 
     try {
-      // TODO: Implement chat API call
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: input,
-          userId: user.id,
-        }),
-      });
-
-      const data = await response.json();
+      const conversationContext = buildConversationContext(currentInput);
+      const response = await sendMessage(conversationContext);
 
       const assistantMessage = {
         role: 'assistant',
-        content: data.response,
+        content: response,
         timestamp: new Date().toISOString(),
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
-      // Add error message to chat
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: 'Sorry, I encountered an error. Please try again.',
+          content: error.message?.includes('API key') 
+            ? 'OpenAI API key is not configured. Please add VITE_OPENAI_API_KEY to your .env file.'
+            : 'Sorry, I encountered an error. Please try again.',
           timestamp: new Date().toISOString(),
         },
       ]);
@@ -98,10 +108,16 @@ function Chat() {
                       : 'bg-indigo-600 text-white'
                     : darkMode
                     ? 'bg-gray-700 text-white'
-                    : 'bg-white text-gray-900'
+                    : 'bg-white text-gray-900 shadow-sm'
                 }`}
               >
-                <p className="text-sm">{message.content}</p>
+                {message.role === 'assistant' ? (
+                  <div className={`prose prose-sm max-w-none ${darkMode ? 'prose-invert' : ''}`}>
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                  </div>
+                ) : (
+                  <p className="text-sm">{message.content}</p>
+                )}
                 <p
                   className={`text-xs mt-1 ${
                     message.role === 'user'

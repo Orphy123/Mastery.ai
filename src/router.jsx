@@ -1,6 +1,7 @@
 import React, { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import Layout from './components/layouts/Layout';
+import { useAuth } from './context/AuthContext';
 
 // Lazy loading pages for better performance
 const Home = lazy(() => import('./pages/Home'));
@@ -25,9 +26,12 @@ const PageLoader = () => (
 
 // Auth guard for protected routes
 const RequireAuth = ({ children }) => {
-  // For demo purposes, we'll check if user exists in localStorage
-  const isAuthenticated = localStorage.getItem('Mastery.ai_user') !== null;
-  
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <PageLoader />;
+  }
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }

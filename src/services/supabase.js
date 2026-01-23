@@ -1,13 +1,19 @@
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseAnonKey =
+  import.meta.env.VITE_SUPABASE_ANON_KEY ||
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing Supabase environment variables');
+if (!isSupabaseConfigured) {
+  console.warn('Supabase environment variables are missing. Auth and profile features will be disabled.');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const resolvedUrl = isSupabaseConfigured ? supabaseUrl : 'https://placeholder.supabase.co';
+const resolvedKey = isSupabaseConfigured ? supabaseAnonKey : 'public-anon-key';
+
+export const supabase = createClient(resolvedUrl, resolvedKey);
 
 // User Profile Functions
 export const getUserProfile = async (userId) => {

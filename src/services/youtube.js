@@ -8,17 +8,19 @@
  * @param {number} options.maxResults - Maximum number of results to return (default: 5)
  * @returns {Promise<Array>} - Array of video objects
  */
-export const searchVideos = async (query, options = {}) => {
-  const { maxResults = 5 } = options;
-  
-  // In a real implementation, this would make an API call to YouTube Data API
-  console.log(`Searching YouTube for: "${query}", max results: ${maxResults}`);
-  
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  // Demo implementation with mock data
-  const mockVideos = [
+const youtubeApiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
+
+const formatViewCount = (count) => {
+  if (!count) return 'N/A';
+  const value = Number(count);
+  if (Number.isNaN(value)) return 'N/A';
+  if (value >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(1)}B`;
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
+  return value.toString();
+};
+
+const getMockVideos = (query) => [
     {
       videoId: 'abc123',
       title: `Understanding ${query} - Educational Video`,
@@ -64,9 +66,77 @@ export const searchVideos = async (query, options = {}) => {
       viewCount: '780K',
       publishedAt: '2022-03-22'
     }
-  ];
-  
-  return mockVideos.slice(0, maxResults);
+];
+
+export const searchVideos = async (query, options = {}) => {
+  const { maxResults = 5 } = options;
+
+  if (!youtubeApiKey) {
+    console.warn('YouTube API key is missing. Falling back to mock data.');
+    return getMockVideos(query).slice(0, maxResults);
+  }
+
+  const searchParams = new URLSearchParams({
+    key: youtubeApiKey,
+    q: query,
+    part: 'snippet',
+    type: 'video',
+    maxResults: String(maxResults),
+    safeSearch: 'moderate',
+    relevanceLanguage: 'en'
+  });
+
+  const searchResponse = await fetch(`https://www.googleapis.com/youtube/v3/search?${searchParams.toString()}`);
+
+  if (!searchResponse.ok) {
+    const errorBody = await searchResponse.json().catch(() => ({}));
+    console.error('YouTube search error:', errorBody);
+    throw new Error('Failed to fetch YouTube videos. Please try again later.');
+  }
+
+  const searchData = await searchResponse.json();
+  const videoIds = (searchData.items || [])
+    .map((item) => item?.id?.videoId)
+    .filter(Boolean);
+
+  if (videoIds.length === 0) {
+    return [];
+  }
+
+  const detailsParams = new URLSearchParams({
+    key: youtubeApiKey,
+    id: videoIds.join(','),
+    part: 'snippet,statistics,contentDetails'
+  });
+
+  const detailsResponse = await fetch(`https://www.googleapis.com/youtube/v3/videos?${detailsParams.toString()}`);
+
+  if (!detailsResponse.ok) {
+    const errorBody = await detailsResponse.json().catch(() => ({}));
+    console.error('YouTube details error:', errorBody);
+    throw new Error('Failed to fetch YouTube video details. Please try again later.');
+  }
+
+  const detailsData = await detailsResponse.json();
+  const detailsById = new Map(
+    (detailsData.items || []).map((item) => [item.id, item])
+  );
+
+  return (searchData.items || []).map((item) => {
+    const details = detailsById.get(item?.id?.videoId);
+    return {
+      videoId: item?.id?.videoId,
+      title: item?.snippet?.title || 'Untitled video',
+      description: item?.snippet?.description || '',
+      thumbnailUrl:
+        item?.snippet?.thumbnails?.medium?.url ||
+        item?.snippet?.thumbnails?.default?.url ||
+        '',
+      channelName: item?.snippet?.channelTitle || 'Unknown channel',
+      viewCount: formatViewCount(details?.statistics?.viewCount),
+      publishedAt: item?.snippet?.publishedAt || ''
+    };
+  });
 };
 
 /**
@@ -75,23 +145,55 @@ export const searchVideos = async (query, options = {}) => {
  * @returns {Promise<Object>} - Video details object
  */
 export const getVideoDetails = async (videoId) => {
-  // In a real implementation, this would make an API call to YouTube Data API
-  console.log(`Getting details for video ID: ${videoId}`);
-  
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  // Return mock data
+  if (!youtubeApiKey) {
+    console.warn('YouTube API key is missing. Falling back to mock data.');
+    return {
+      videoId,
+      title: 'Sample Video Title',
+      description: 'This is a sample description for the video. It would contain details about the content.',
+      thumbnailUrl: 'https://i.ytimg.com/vi/placeholder/default.jpg',
+      channelName: 'Sample Channel',
+      viewCount: '500K',
+      publishedAt: '2022-06-15',
+      tags: ['education', 'learning', 'sample'],
+      duration: '10:15'
+    };
+  }
+
+  const params = new URLSearchParams({
+    key: youtubeApiKey,
+    id: videoId,
+    part: 'snippet,statistics,contentDetails'
+  });
+
+  const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?${params.toString()}`);
+
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({}));
+    console.error('YouTube details error:', errorBody);
+    throw new Error('Failed to fetch YouTube video details.');
+  }
+
+  const data = await response.json();
+  const item = data.items?.[0];
+
+  if (!item) {
+    throw new Error('Video not found.');
+  }
+
   return {
     videoId,
-    title: 'Sample Video Title',
-    description: 'This is a sample description for the video. It would contain details about the content.',
-    thumbnailUrl: 'https://i.ytimg.com/vi/placeholder/default.jpg',
-    channelName: 'Sample Channel',
-    viewCount: '500K',
-    publishedAt: '2022-06-15',
-    tags: ['education', 'learning', 'sample'],
-    duration: '10:15'
+    title: item?.snippet?.title || 'Untitled video',
+    description: item?.snippet?.description || '',
+    thumbnailUrl:
+      item?.snippet?.thumbnails?.high?.url ||
+      item?.snippet?.thumbnails?.medium?.url ||
+      '',
+    channelName: item?.snippet?.channelTitle || 'Unknown channel',
+    viewCount: formatViewCount(item?.statistics?.viewCount),
+    publishedAt: item?.snippet?.publishedAt || '',
+    tags: item?.snippet?.tags || [],
+    duration: item?.contentDetails?.duration || ''
   };
 };
 
@@ -137,4 +239,4 @@ export const findEducationalVideos = async (topic, educationLevel = 'middle', ma
  * Checks if the system is using demo mode vs actual API
  * @returns {boolean} - True if using demo mode
  */
-export const isUsingDemoMode = () => true;
+export const isUsingDemoMode = () => !youtubeApiKey;

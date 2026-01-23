@@ -38,6 +38,9 @@ function Review() {
   const [explanation, setExplanation] = useState('');
   const [showExplanation, setShowExplanation] = useState(false);
   const [explanationLoading, setExplanationLoading] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newItemConcept, setNewItemConcept] = useState('');
+  const [newItemPrompt, setNewItemPrompt] = useState('');
   const responseRef = useRef(null);
   
   const { currentUser } = useAuth();
@@ -185,13 +188,24 @@ function Review() {
     }
   };
   
-  // Create new review items
+  // Open create item modal
   const handleCreateNewItem = () => {
-    // Implement a modal or form to create new review items
-    // For now, we'll just create a sample item
+    setShowCreateModal(true);
+    setNewItemConcept('');
+    setNewItemPrompt('');
+  };
+
+  // Submit new review item from modal
+  const handleSubmitNewItem = (e) => {
+    e.preventDefault();
+    
+    if (!newItemConcept.trim()) return;
+    
+    const prompt = newItemPrompt.trim() || `What is ${newItemConcept}?`;
+    
     const newItem = createReviewItem(
-      'Sample Review Item',
-      'What is the key concept here?',
+      newItemConcept.trim(),
+      prompt,
       'middle'
     );
     
@@ -211,6 +225,11 @@ function Review() {
         setCurrentItem(newItem);
       }
     }
+    
+    // Close modal
+    setShowCreateModal(false);
+    setNewItemConcept('');
+    setNewItemPrompt('');
   };
   
   // Format date for display
@@ -523,6 +542,98 @@ function Review() {
             )}
           </div>
         </section>
+      )}
+
+      {/* Create New Item Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            {/* Backdrop */}
+            <div 
+              className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+              onClick={() => setShowCreateModal(false)}
+            ></div>
+
+            {/* Modal */}
+            <div className={`relative inline-block px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6 ${
+              darkMode ? 'bg-gray-800' : 'bg-white'
+            }`}>
+              <form onSubmit={handleSubmitNewItem}>
+                <div>
+                  <h3 className={`text-lg font-medium leading-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    Create New Review Item
+                  </h3>
+                  <p className={`mt-2 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                    Add a concept you want to remember using spaced repetition.
+                  </p>
+                </div>
+
+                <div className="mt-4 space-y-4">
+                  <div>
+                    <label htmlFor="concept" className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      Concept / Topic *
+                    </label>
+                    <input
+                      type="text"
+                      id="concept"
+                      value={newItemConcept}
+                      onChange={(e) => setNewItemConcept(e.target.value)}
+                      placeholder="e.g., Photosynthesis, Pythagorean Theorem"
+                      className={`mt-1 block w-full rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                        darkMode 
+                          ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                          : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                      } border px-3 py-2`}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="prompt" className={`block text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      Review Prompt (optional)
+                    </label>
+                    <input
+                      type="text"
+                      id="prompt"
+                      value={newItemPrompt}
+                      onChange={(e) => setNewItemPrompt(e.target.value)}
+                      placeholder="e.g., What is photosynthesis?"
+                      className={`mt-1 block w-full rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+                        darkMode 
+                          ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                          : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                      } border px-3 py-2`}
+                    />
+                    <p className={`mt-1 text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      If left blank, we'll use "What is [concept]?"
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowCreateModal(false)}
+                    className={`w-full inline-flex justify-center rounded-lg border px-4 py-2 text-base font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm ${
+                      darkMode 
+                        ? 'border-gray-600 bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                        : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={!newItemConcept.trim()}
+                    className="w-full inline-flex justify-center rounded-lg border border-transparent px-4 py-2 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    Create Item
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

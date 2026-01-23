@@ -3,10 +3,21 @@
 
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true // Note: In production, you should use a backend proxy
-});
+const openaiApiKey = import.meta.env.VITE_OPENAI_API_KEY;
+const openai = openaiApiKey
+  ? new OpenAI({
+      apiKey: openaiApiKey,
+      dangerouslyAllowBrowser: true // Note: In production, you should use a backend proxy
+    })
+  : null;
+
+const requireOpenAI = () => {
+  if (!openai) {
+    throw new Error('OpenAI API key is missing. Set VITE_OPENAI_API_KEY in your .env file.');
+  }
+
+  return openai;
+};
 
 /**
  * Generates an explanation for a given topic using AI
@@ -26,7 +37,7 @@ export const generateExplanation = async (query, level = 'middle') => {
     
     Format the response in Markdown with appropriate headings and bullet points.`;
 
-    const completion = await openai.chat.completions.create({
+    const completion = await requireOpenAI().chat.completions.create({
       messages: [
         {
           role: "system",
@@ -37,7 +48,7 @@ export const generateExplanation = async (query, level = 'middle') => {
           content: prompt
         }
       ],
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o-mini",
       temperature: 0.7,
       max_tokens: 1000
     });
@@ -128,13 +139,13 @@ These study notes are tailored for ${level} level students.
  * Checks if the system is using demo mode vs actual API
  * @returns {boolean} - True if using demo mode
  */
-export const isUsingDemoMode = () => true;
+export const isUsingDemoMode = () => !openaiApiKey;
 
 export const sendMessage = async (message) => {
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await requireOpenAI().chat.completions.create({
       messages: [{ role: "user", content: message }],
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o-mini",
     });
 
     return completion.choices[0].message.content;

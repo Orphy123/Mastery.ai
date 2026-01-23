@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { generateProblems, verifyAnswer, adjustDifficulty } from '../services/practiceGenerator';
@@ -35,9 +36,10 @@ function Practice() {
   
   const { currentUser } = useAuth();
   const { darkMode } = useTheme();
+  const location = useLocation();
   const answerInputRef = useRef(null);
   
-  // Update page title
+  // Update page title and load from navigation state
   useEffect(() => {
     document.title = 'Practice Problems - Mastery.ai';
     
@@ -46,7 +48,15 @@ function Practice() {
     if (preferences?.difficulty) {
       setDifficulty(preferences.difficulty);
     }
-  }, []);
+    
+    // Check if we came from Search page with a topic
+    if (location.state?.topic) {
+      setTopic(location.state.topic);
+      if (location.state?.difficulty) {
+        setDifficulty(location.state.difficulty);
+      }
+    }
+  }, [location.state]);
   
   // Get current problem
   const currentProblem = problems.length > 0 && currentProblemIndex < problems.length 

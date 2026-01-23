@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { isSupabaseConfigured } from '../services/supabase';
 import { profileService } from '../services/profile';
-import { UserCircleIcon } from '@heroicons/react/24/outline';
+import { UserCircleIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
+
+const PROFILE_STORAGE_KEY = 'Mastery.ai_user_profile';
 
 function Profile() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { darkMode } = useTheme();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -21,11 +26,26 @@ function Profile() {
 
   useEffect(() => {
     loadProfile();
-  }, []);
+  }, [user]);
 
   const loadProfile = async () => {
     try {
-      const data = await profileService.getProfile();
+      let data;
+      
+      if (isSupabaseConfigured) {
+        data = await profileService.getProfile();
+      } else {
+        // Demo mode: load from localStorage
+        const stored = localStorage.getItem(PROFILE_STORAGE_KEY);
+        data = stored ? JSON.parse(stored) : {
+          id: user?.id,
+          email: user?.email,
+          full_name: user?.full_name || '',
+          avatar_url: null,
+          preferences: { theme: 'light', notifications: true }
+        };
+      }
+      
       setProfile(data);
       setFormData({
         full_name: data.full_name || '',
@@ -35,7 +55,19 @@ function Profile() {
         },
       });
     } catch (err) {
-      setError('Failed to load profile');
+      // Fallback to user data if profile load fails
+      const fallbackProfile = {
+        id: user?.id,
+        email: user?.email,
+        full_name: user?.full_name || '',
+        avatar_url: null,
+        preferences: { theme: 'light', notifications: true }
+      };
+      setProfile(fallbackProfile);
+      setFormData({
+        full_name: fallbackProfile.full_name,
+        preferences: fallbackProfile.preferences,
+      });
       console.error('Error loading profile:', err);
     } finally {
       setLoading(false);
@@ -49,10 +81,23 @@ function Profile() {
     setLoading(true);
 
     try {
-      const updatedProfile = await profileService.updateProfile({
-        full_name: formData.full_name,
-        preferences: formData.preferences,
-      });
+      let updatedProfile;
+      
+      if (isSupabaseConfigured) {
+        updatedProfile = await profileService.updateProfile({
+          full_name: formData.full_name,
+          preferences: formData.preferences,
+        });
+      } else {
+        // Demo mode: save to localStorage
+        updatedProfile = {
+          ...profile,
+          full_name: formData.full_name,
+          preferences: formData.preferences,
+        };
+        localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(updatedProfile));
+      }
+      
       setProfile(updatedProfile);
       setSuccess('Profile updated successfully');
     } catch (err) {
@@ -72,7 +117,31 @@ function Profile() {
     setSuccess('');
 
     try {
-      const updatedProfile = await profileService.uploadAvatar(file);
+      let updatedProfile;
+      
+      if (isSupabaseConfigured) {
+        updatedProfile = await profileService.uploadAvatar(file);
+      } else {
+        // Demo mode: store as base64 in localStorage
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          updatedProfile = {
+            ...profile,
+            avatar_url: reader.result,
+          };
+          localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(updatedProfile));
+          setProfile(updatedProfile);
+          setSuccess('Avatar updated successfully');
+          setLoading(false);
+        };
+        reader.onerror = () => {
+          setError('Failed to read image file');
+          setLoading(false);
+        };
+        reader.readAsDataURL(file);
+        return;
+      }
+      
       setProfile(updatedProfile);
       setSuccess('Avatar updated successfully');
     } catch (err) {
@@ -81,6 +150,11 @@ function Profile() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/login');
   };
 
   if (loading && !profile) {
@@ -209,7 +283,7 @@ function Profile() {
               </div>
             </div>
 
-            <div>
+            <div className="space-y-3">
               <button
                 type="submit"
                 disabled={loading}
@@ -222,6 +296,19 @@ function Profile() {
                 } text-white font-medium`}
               >
                 {loading ? 'Saving...' : 'Save Changes'}
+              </button>
+              
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className={`w-full px-4 py-2 rounded-lg flex items-center justify-center ${
+                  darkMode
+                    ? 'bg-red-600 hover:bg-red-700'
+                    : 'bg-red-600 hover:bg-red-700'
+                } text-white font-medium`}
+              >
+                <ArrowRightOnRectangleIcon className="h-5 w-5 mr-2" />
+                Sign Out
               </button>
             </div>
           </form>
