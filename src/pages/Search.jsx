@@ -176,6 +176,9 @@ function Search() {
     e.preventDefault();
     if (!query.trim()) return;
 
+    setShowHistory(false);
+    searchInputRef.current?.blur();
+
     const grade = selectedGrade;
     const trimmed = query.trim();
     setIsLoading(true);
