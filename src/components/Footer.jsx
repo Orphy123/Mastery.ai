@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
-import { SparklesIcon } from '@heroicons/react/24/outline';
+
 
 function Footer() {
   const { darkMode } = useTheme();
@@ -10,13 +10,8 @@ function Footer() {
     <footer className={`border-t ${darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600">
-              <SparklesIcon className="h-4 w-4 text-white" />
-            </div>
-            <span className={`font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              Mastery<span className="text-indigo-500">.ai</span>
-            </span>
+          <div className="flex items-center">
+            <img src="/assets/images/Logo.png" alt="Mastery.ai" className="h-7 w-auto" />
           </div>
 
           <div className="flex flex-wrap justify-center gap-6">

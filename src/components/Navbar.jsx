@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { SunIcon, MoonIcon, UserCircleIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { SunIcon, MoonIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';
 
 const NAV_LINKS = [
@@ -49,13 +49,8 @@ function Navbar() {
         <div className="flex justify-between h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center gap-2 group">
-              <div className="p-1.5 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 group-hover:from-indigo-600 group-hover:to-purple-700 transition-all">
-                <SparklesIcon className="h-5 w-5 text-white" />
-              </div>
-              <span className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                Mastery<span className="text-indigo-500">.ai</span>
-              </span>
+            <Link to="/" className="flex items-center">
+              <img src="/assets/images/Logo.png" alt="Mastery.ai" className="h-9 w-auto" />
             </Link>
           </div>
 
