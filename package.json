@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "push": "bash scripts/push.sh",
+    "push:msg": "bash scripts/push.sh",
+    "autopush": "bash scripts/autopush.sh"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.18",
