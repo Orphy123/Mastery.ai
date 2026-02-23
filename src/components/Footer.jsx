@@ -23,7 +23,6 @@ function Footer() {
             {[
               { to: '/search', label: 'Search' },
               { to: '/practice', label: 'Practice' },
-              { to: '/review', label: 'Review' },
               { to: '/chat', label: 'Chat' },
             ].map(({ to, label }) => (
               <Link

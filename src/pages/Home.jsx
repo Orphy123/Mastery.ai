@@ -4,7 +4,6 @@ import {
   SparklesIcon,
   LightBulbIcon,
   AcademicCapIcon,
-  ClockIcon,
   ChartBarIcon,
   ChatBubbleLeftRightIcon,
   ArrowRightIcon,
@@ -30,14 +29,6 @@ const FEATURES = [
     link: '/practice',
   },
   {
-    title: 'Spaced Repetition',
-    description: 'Never forget what you learn — our scheduler reviews concepts at the optimal time.',
-    icon: ClockIcon,
-    color: 'from-blue-500 to-cyan-500',
-    bg: 'bg-blue-50 dark:bg-blue-500/10',
-    link: '/review',
-  },
-  {
     title: 'Progress Tracking',
     description: 'Visualize your learning journey with detailed stats, streaks, and mastery charts.',
     icon: ChartBarIcon,
@@ -58,7 +49,7 @@ const FEATURES = [
 const STEPS = [
   { num: '01', title: 'Ask a Question', desc: 'Type any academic question — any subject, any level.' },
   { num: '02', title: 'Learn Instantly', desc: 'Get a tailored explanation, videos, and practice problems.' },
-  { num: '03', title: 'Retain Forever', desc: 'Our spaced repetition system makes sure you never forget.' },
+  { num: '03', title: 'Master It', desc: 'Practice with adaptive problems and track your progress over time.' },
 ];
 
 function Home() {
@@ -88,7 +79,7 @@ function Home() {
           </h1>
 
           <p className={`max-w-2xl mx-auto text-lg md:text-xl leading-relaxed mb-10 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-            Get instant AI explanations, adaptive practice problems, and a spaced-repetition system that ensures you never forget what you learn.
+            Get instant AI explanations, adaptive practice problems, and progress tracking to help you master any subject.
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">

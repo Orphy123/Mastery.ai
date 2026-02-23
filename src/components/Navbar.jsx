@@ -8,7 +8,6 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/solid';
 const NAV_LINKS = [
   { to: '/search', label: 'Search' },
   { to: '/practice', label: 'Practice' },
-  { to: '/review', label: 'Review' },
   { to: '/progress', label: 'Progress' },
   { to: '/chat', label: 'Chat' },
 ];

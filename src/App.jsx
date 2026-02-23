@@ -12,7 +12,6 @@ import Login from './pages/Login';
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const Search = lazy(() => import('./pages/Search'));
 const Practice = lazy(() => import('./pages/Practice'));
-const Review = lazy(() => import('./pages/Review'));
 const Progress = lazy(() => import('./pages/Progress'));
 const Chat = lazy(() => import('./pages/Chat'));
 const Profile = lazy(() => import('./pages/Profile'));
@@ -55,7 +54,6 @@ function AppContent() {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
               <Route path="/practice" element={<ProtectedRoute><Practice /></ProtectedRoute>} />
-              <Route path="/review" element={<ProtectedRoute><Review /></ProtectedRoute>} />
               <Route path="/progress" element={<ProtectedRoute><Progress /></ProtectedRoute>} />
               <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />

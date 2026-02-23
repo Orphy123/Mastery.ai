@@ -4,17 +4,14 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { generateExplanation } from '../services/openai';
 import { searchVideos, getEmbedUrl } from '../services/youtube';
-import { addToSearchHistory, getSearchHistory, saveReviewItem } from '../services/storageService';
-import { createReviewItem } from '../services/reviewScheduler';
+import { addToSearchHistory, getSearchHistory } from '../services/storageService';
 import {
   MagnifyingGlassIcon,
   ArrowPathIcon,
   AcademicCapIcon,
   ClockIcon,
-  BookmarkIcon,
   LightBulbIcon,
   PlayCircleIcon,
-  CheckIcon,
   SparklesIcon,
 } from '@heroicons/react/24/outline';
 import ReactMarkdown from 'react-markdown';
@@ -154,7 +151,6 @@ function Search() {
   const [selectedGrade, setSelectedGrade] = useState('middle');
   const [recentQueries, setRecentQueries] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
   const [activeVideo, setActiveVideo] = useState(null);
   const searchInputRef = useRef(null);
   const resultRef = useRef(null);
@@ -185,7 +181,6 @@ function Search() {
     setIsStreaming(false);
     setExplanation('');
     setVideos([]);
-    setIsSaved(false);
     setActiveVideo(null);
     setActiveQuery(trimmed);
 
@@ -232,7 +227,6 @@ function Search() {
     if (newGrade === selectedGrade) return;
 
     setSelectedGrade(newGrade);
-    setIsSaved(false);
 
     if (!activeQuery) return;
 
@@ -267,12 +261,6 @@ function Search() {
     setTimeout(() => {
       searchInputRef.current?.form?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
     }, 100);
-  };
-
-  const handleSaveToReview = () => {
-    if (!activeQuery || !explanation || isSaved) return;
-    saveReviewItem(createReviewItem(activeQuery, `What is ${activeQuery}?`, selectedGrade));
-    setIsSaved(true);
   };
 
   const handlePractice = () => {
@@ -392,13 +380,6 @@ function Search() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <button onClick={handleSaveToReview} disabled={isSaved} className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      isSaved
-                        ? darkMode ? 'bg-green-500/20 text-green-400' : 'bg-green-50 text-green-700 ring-1 ring-green-200'
-                        : darkMode ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' : 'bg-white text-gray-700 hover:bg-gray-50 ring-1 ring-gray-200 hover:ring-gray-300'
-                    }`}>
-                      {isSaved ? <><CheckIcon className="h-4 w-4" />Saved</> : <><BookmarkIcon className="h-4 w-4" />Save</>}
-                    </button>
                     <button onClick={handlePractice} className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-sm">
                       <AcademicCapIcon className="h-4 w-4" />Practice
                     </button>
