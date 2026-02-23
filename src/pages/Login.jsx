@@ -26,7 +26,8 @@ function Login() {
       if (isSignUp) {
         const { error } = await signUp({ email, password, fullName });
         if (error) throw error;
-        setMessage('Check your email for the confirmation link!');
+        navigate('/');
+        return;
       } else {
         const { error } = await signIn({ email, password });
         if (error) throw error;

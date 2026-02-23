@@ -21,9 +21,13 @@ function ForgotPassword() {
     try {
       const { error } = await resetPassword(email);
       if (error) throw error;
-      setMessage('Check your email for the password reset link!');
+      setMessage('If an account exists with this email, a password reset link has been sent.');
     } catch (error) {
-      setError(error.message);
+      if (error.message?.includes('Supabase')) {
+        setMessage('Password reset is not available in demo mode. Please sign in with your existing credentials or create a new account.');
+      } else {
+        setError(error.message);
+      }
     } finally {
       setLoading(false);
     }

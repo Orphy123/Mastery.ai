@@ -26,12 +26,14 @@ function Practice() {
   const [showExplanation, setShowExplanation] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [currentHintIndex, setCurrentHintIndex] = useState(0);
-  const [difficulty, setDifficulty] = useState('middle'); // elementary, middle, high
+  const [difficulty, setDifficulty] = useState('middle');
   const [count, setCount] = useState(5);
   const [progress, setProgress] = useState({ correct: 0, total: 0 });
-  const [topicSuggestions, setTopicSuggestions] = useState([
+  const [generationError, setGenerationError] = useState('');
+  const [topicSuggestions] = useState([
     'Photosynthesis', 'Quadratic Equations', 'US Constitution', 
-    'Chemical Reactions', 'Shakespeare', 'World War II'
+    'Chemical Reactions', 'Shakespeare', 'World War II',
+    'Civil Rights Movement', 'DNA & Genetics', 'The Solar System'
   ]);
   
   const { currentUser } = useAuth();
@@ -70,6 +72,7 @@ function Practice() {
     if (!topic.trim()) return;
     
     setLoading(true);
+    setGenerationError('');
     setProblems([]);
     setCurrentProblemIndex(0);
     setUserAnswer('');
@@ -80,11 +83,11 @@ function Practice() {
     setProgress({ correct: 0, total: 0 });
     
     try {
-      // Generate problems based on topic and difficulty
       const generatedProblems = await generateProblems(topic, difficulty, count);
       setProblems(generatedProblems);
     } catch (error) {
       console.error('Error generating problems:', error);
+      setGenerationError(error.message || 'Failed to generate problems. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -218,7 +221,12 @@ function Practice() {
                   Difficulty Level
                 </label>
                 <div className="flex space-x-2">
-                  {['elementary', 'middle', 'high'].map((level) => (
+                  {[
+                    ['elementary', 'Elementary'],
+                    ['middle', 'Middle'],
+                    ['high', 'High School'],
+                    ['college', 'College'],
+                  ].map(([level, label]) => (
                     <button
                       key={level}
                       type="button"
@@ -229,7 +237,7 @@ function Practice() {
                           : `${darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`
                       }`}
                     >
-                      {level.charAt(0).toUpperCase() + level.slice(1)}
+                      {label}
                     </button>
                   ))}
                 </div>
@@ -300,9 +308,33 @@ function Practice() {
       {loading && (
         <div className="flex flex-col items-center justify-center py-20">
           <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className={`text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-            Generating practice problems for {topic}...
+          <p className={`text-lg font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+            Creating questions about {topic}...
           </p>
+          <p className={`text-sm mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+            Our AI is crafting {count} unique questions at {difficulty} level
+          </p>
+        </div>
+      )}
+      
+      {/* Error State */}
+      {!loading && generationError && problems.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-16">
+          <div className={`p-4 rounded-xl mb-4 ${darkMode ? 'bg-red-500/10' : 'bg-red-50'}`}>
+            <XCircleIcon className="h-10 w-10 text-red-500" />
+          </div>
+          <p className={`text-lg font-medium mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            Something went wrong
+          </p>
+          <p className={`text-sm mb-6 max-w-md text-center ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+            {generationError}
+          </p>
+          <button
+            onClick={() => { setGenerationError(''); setProblems([]); }}
+            className="px-6 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition-colors"
+          >
+            Try Again
+          </button>
         </div>
       )}
       
@@ -361,41 +393,71 @@ function Practice() {
               {currentProblem.options && currentProblem.options.length > 0 && (
                 <div className="mb-6">
                   <div className="space-y-3">
-                    {currentProblem.options.map((option, index) => (
-                      <div key={index}>
-                        <label className={`flex items-center p-3 rounded-lg cursor-pointer ${
-                          userAnswer === option
-                            ? darkMode
-                              ? 'bg-indigo-900/30 border border-indigo-700'
-                              : 'bg-indigo-50 border border-indigo-200'
-                            : darkMode
-                              ? 'bg-gray-700 hover:bg-gray-650'
-                              : 'bg-gray-50 hover:bg-gray-100'
-                        }`}>
-                          <input
-                            type="radio"
-                            name="answer"
-                            value={option}
-                            checked={userAnswer === option}
-                            onChange={(e) => setUserAnswer(e.target.value)}
-                            disabled={result !== null}
-                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-                          />
-                          <span className={`ml-3 ${darkMode ? 'text-gray-200' : 'text-gray-900'}`}>
-                            {option}
-                          </span>
-                          
-                          {/* Show check/X mark when result is available */}
-                          {result !== null && option === currentProblem.correctAnswer && (
-                            <CheckCircleIcon className="h-5 w-5 ml-auto text-green-500" />
-                          )}
-                          {result !== null && userAnswer === option && option !== currentProblem.correctAnswer && (
-                            <XCircleIcon className="h-5 w-5 ml-auto text-red-500" />
-                          )}
-                        </label>
-                      </div>
-                    ))}
+                    {currentProblem.options.map((option, index) => {
+                      const isSelected = userAnswer === option;
+                      const isCorrectOption = option === currentProblem.correctAnswer;
+                      const showResult = result !== null;
+                      
+                      let optionStyle;
+                      if (showResult && isCorrectOption) {
+                        optionStyle = darkMode
+                          ? 'bg-green-900/30 border border-green-600 ring-1 ring-green-500/30'
+                          : 'bg-green-50 border border-green-300';
+                      } else if (showResult && isSelected && !isCorrectOption) {
+                        optionStyle = darkMode
+                          ? 'bg-red-900/30 border border-red-600 ring-1 ring-red-500/30'
+                          : 'bg-red-50 border border-red-300';
+                      } else if (isSelected) {
+                        optionStyle = darkMode
+                          ? 'bg-indigo-900/30 border border-indigo-700'
+                          : 'bg-indigo-50 border border-indigo-200';
+                      } else {
+                        optionStyle = darkMode
+                          ? 'bg-gray-700 hover:bg-gray-650 border border-transparent'
+                          : 'bg-gray-50 hover:bg-gray-100 border border-transparent';
+                      }
+                      
+                      return (
+                        <div key={index}>
+                          <label className={`flex items-center p-3.5 rounded-xl cursor-pointer transition-all ${optionStyle} ${showResult ? 'cursor-default' : ''}`}>
+                            <input
+                              type="radio"
+                              name="answer"
+                              value={option}
+                              checked={isSelected}
+                              onChange={(e) => setUserAnswer(e.target.value)}
+                              disabled={showResult}
+                              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                            />
+                            <span className={`ml-3 text-sm font-medium ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                              {option}
+                            </span>
+                            {showResult && isCorrectOption && (
+                              <CheckCircleIcon className="h-5 w-5 ml-auto text-green-500 flex-shrink-0" />
+                            )}
+                            {showResult && isSelected && !isCorrectOption && (
+                              <XCircleIcon className="h-5 w-5 ml-auto text-red-500 flex-shrink-0" />
+                            )}
+                          </label>
+                        </div>
+                      );
+                    })}
                   </div>
+                  
+                  {result === 'correct' && (
+                    <div className={`mt-4 flex items-center gap-2 px-4 py-2.5 rounded-lg ${darkMode ? 'bg-green-500/10' : 'bg-green-50'}`}>
+                      <CheckCircleIcon className="h-5 w-5 text-green-500 flex-shrink-0" />
+                      <span className={`text-sm font-medium ${darkMode ? 'text-green-400' : 'text-green-700'}`}>Correct! Great job.</span>
+                    </div>
+                  )}
+                  {result === 'incorrect' && (
+                    <div className={`mt-4 flex items-center gap-2 px-4 py-2.5 rounded-lg ${darkMode ? 'bg-red-500/10' : 'bg-red-50'}`}>
+                      <XCircleIcon className="h-5 w-5 text-red-500 flex-shrink-0" />
+                      <span className={`text-sm font-medium ${darkMode ? 'text-red-400' : 'text-red-700'}`}>
+                        Not quite. The correct answer is: <strong>{currentProblem.correctAnswer}</strong>
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
               

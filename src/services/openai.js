@@ -19,40 +19,94 @@ const requireOpenAI = () => {
   return openai;
 };
 
+const LEVEL_PROFILES = {
+  elementary: {
+    audience: 'a curious 8-10 year old (elementary school)',
+    tone: 'Use very simple words, short sentences, and fun comparisons a kid would understand. Relate things to everyday life (toys, food, animals, school). Be enthusiastic and encouraging.',
+    sentenceGuide: 'Keep each section to 2-3 short, simple sentences. Use bullet points with single short sentences.',
+    sections: ['In a Nutshell', 'Key Ideas', 'How It Works', 'Fun Fact'],
+  },
+  middle: {
+    audience: 'a middle school student (ages 11-13)',
+    tone: 'Use clear, friendly language. You can introduce vocabulary but always explain it immediately. Use relatable analogies.',
+    sentenceGuide: 'Keep each section to 3-4 sentences. Bullet points can be 1-2 sentences each.',
+    sections: ['In a Nutshell', 'Key Ideas', 'How It Works', 'Real-World Examples', 'Think About It'],
+  },
+  high: {
+    audience: 'a high school student (ages 14-17)',
+    tone: 'Use proper terminology and explain it in context. Be clear and engaging while respecting their intelligence. Include cause-and-effect reasoning.',
+    sentenceGuide: 'Each section can be 4-5 sentences. Use structured bullet points.',
+    sections: ['In a Nutshell', 'Key Ideas', 'How It Works', 'Real-World Examples', 'Think About It', 'Go Further'],
+  },
+  college: {
+    audience: 'a college or university student',
+    tone: 'Use technical and academic language freely. Include nuance, edge cases, and connections to broader fields. Be thorough and precise.',
+    sentenceGuide: 'Be thorough in each section. Use structured lists, technical terms, and detailed reasoning.',
+    sections: ['In a Nutshell', 'Key Ideas', 'How It Works', 'Real-World Examples', 'Deep Dive', 'Go Further'],
+  },
+};
+
+function buildExplanationParams(query, level) {
+  const profile = LEVEL_PROFILES[level] || LEVEL_PROFILES.middle;
+  const sectionInstructions = profile.sections.map((s) => `## ${s}`).join('\n');
+
+  const prompt = `Explain "${query}" for ${profile.audience}.
+
+RULES:
+- ${profile.tone}
+- ${profile.sentenceGuide}
+- Start with a single bold sentence on its own line as a TLDR summary (no heading, no label — just the bold sentence).
+- Then use EXACTLY these markdown headings in this order, each on its own line:
+${sectionInstructions}
+- Under each heading, use short paragraphs and/or bullet points.
+- Do NOT add any headings beyond the ones listed above.
+- Make every sentence count — no filler.`;
+
+  return {
+    messages: [
+      {
+        role: 'system',
+        content:
+          'You are Mastery.ai — a world-class educational explainer. You make any topic easy to understand by breaking it into bite-sized pieces. You always match your language to the student\'s age. You are concise, clear, and never boring.',
+      },
+      { role: 'user', content: prompt },
+    ],
+    model: 'gpt-4o-mini',
+    temperature: 0.7,
+    max_tokens: 1200,
+  };
+}
+
 /**
- * Generates an explanation for a given topic using AI
+ * Generates a structured, grade-appropriate explanation for a given topic.
+ * Supports streaming via an optional onUpdate callback — when provided, the
+ * response streams token-by-token and onUpdate is called with the accumulated
+ * text so the UI can render progressively.
+ *
  * @param {string} query - The question to be explained
  * @param {string} level - The educational level (elementary, middle, high, college)
- * @returns {Promise<string>} - The generated explanation
+ * @param {Object} [opts]
+ * @param {(text: string) => void} [opts.onUpdate] - Called with accumulated text on each chunk
+ * @returns {Promise<string>} - The full generated explanation
  */
-export const generateExplanation = async (query, level = 'middle') => {
+export const generateExplanation = async (query, level = 'middle', { onUpdate } = {}) => {
+  const params = buildExplanationParams(query, level);
+
   try {
-    const prompt = `Please provide a comprehensive explanation about "${query}" tailored for ${level} school level. 
-    Include the following sections:
-    1. A clear definition and overview
-    2. Key concepts and principles
-    3. How it works or is applied
-    4. Examples and practical applications
-    5. Additional resources for further learning
-    
-    Format the response in Markdown with appropriate headings and bullet points.`;
-
-    const completion = await requireOpenAI().chat.completions.create({
-      messages: [
-        {
-          role: "system",
-          content: "You are an expert educational content creator who specializes in creating clear, engaging, and age-appropriate explanations."
-        },
-        {
-          role: "user",
-          content: prompt
+    if (onUpdate) {
+      const stream = await requireOpenAI().chat.completions.create({ ...params, stream: true });
+      let accumulated = '';
+      for await (const chunk of stream) {
+        const delta = chunk.choices?.[0]?.delta?.content;
+        if (delta) {
+          accumulated += delta;
+          onUpdate(accumulated);
         }
-      ],
-      model: "gpt-4o-mini",
-      temperature: 0.7,
-      max_tokens: 1000
-    });
+      }
+      return accumulated;
+    }
 
+    const completion = await requireOpenAI().chat.completions.create(params);
     return completion.choices[0].message.content;
   } catch (error) {
     console.error('Error generating explanation:', error);
@@ -141,11 +195,29 @@ These study notes are tailored for ${level} level students.
  */
 export const isUsingDemoMode = () => !openaiApiKey;
 
-export const sendMessage = async (message) => {
+/**
+ * Send a chat message with full conversation history for context.
+ * @param {string|Array} messageOrHistory - A single string, or an array of {role, content} messages
+ * @returns {Promise<string>} - The assistant's response
+ */
+export const sendMessage = async (messageOrHistory) => {
+  const messages = Array.isArray(messageOrHistory)
+    ? messageOrHistory
+    : [{ role: 'user', content: messageOrHistory }];
+
   try {
     const completion = await requireOpenAI().chat.completions.create({
-      messages: [{ role: "user", content: message }],
-      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You are Mastery.ai, a friendly and knowledgeable educational assistant. Help students learn by giving clear, encouraging explanations. Use markdown formatting when helpful. Keep answers concise but thorough.',
+        },
+        ...messages,
+      ],
+      model: 'gpt-4o-mini',
+      temperature: 0.7,
+      max_tokens: 1000,
     });
 
     return completion.choices[0].message.content;

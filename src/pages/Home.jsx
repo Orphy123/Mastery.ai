@@ -1,177 +1,215 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { SparklesIcon, LightBulbIcon, AcademicCapIcon, ClockIcon, ChartBarIcon } from '@heroicons/react/24/outline';
+import {
+  SparklesIcon,
+  LightBulbIcon,
+  AcademicCapIcon,
+  ClockIcon,
+  ChartBarIcon,
+  ChatBubbleLeftRightIcon,
+  ArrowRightIcon,
+} from '@heroicons/react/24/outline';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
+
+const FEATURES = [
+  {
+    title: 'AI Explanations',
+    description: 'Get instant, grade-level explanations with supporting YouTube videos for any topic.',
+    icon: LightBulbIcon,
+    color: 'from-amber-500 to-orange-500',
+    bg: 'bg-amber-50 dark:bg-amber-500/10',
+    link: '/search',
+  },
+  {
+    title: 'Practice Problems',
+    description: 'Strengthen understanding with AI-generated questions that adapt to your skill level.',
+    icon: AcademicCapIcon,
+    color: 'from-emerald-500 to-teal-500',
+    bg: 'bg-emerald-50 dark:bg-emerald-500/10',
+    link: '/practice',
+  },
+  {
+    title: 'Spaced Repetition',
+    description: 'Never forget what you learn — our scheduler reviews concepts at the optimal time.',
+    icon: ClockIcon,
+    color: 'from-blue-500 to-cyan-500',
+    bg: 'bg-blue-50 dark:bg-blue-500/10',
+    link: '/review',
+  },
+  {
+    title: 'Progress Tracking',
+    description: 'Visualize your learning journey with detailed stats, streaks, and mastery charts.',
+    icon: ChartBarIcon,
+    color: 'from-purple-500 to-pink-500',
+    bg: 'bg-purple-50 dark:bg-purple-500/10',
+    link: '/progress',
+  },
+  {
+    title: 'AI Chat Tutor',
+    description: 'Have a conversation with your personal AI study assistant — anytime, any subject.',
+    icon: ChatBubbleLeftRightIcon,
+    color: 'from-indigo-500 to-violet-500',
+    bg: 'bg-indigo-50 dark:bg-indigo-500/10',
+    link: '/chat',
+  },
+];
+
+const STEPS = [
+  { num: '01', title: 'Ask a Question', desc: 'Type any academic question — any subject, any level.' },
+  { num: '02', title: 'Learn Instantly', desc: 'Get a tailored explanation, videos, and practice problems.' },
+  { num: '03', title: 'Retain Forever', desc: 'Our spaced repetition system makes sure you never forget.' },
+];
 
 function Home() {
   const { darkMode } = useTheme();
+  const { user } = useAuth();
 
-  // Track page view
   useEffect(() => {
-    // In a production app, we would track analytics here
-    document.title = 'Mastery.ai - Learning Made Simple';
+    document.title = 'Mastery.ai — Learning Made Simple';
   }, []);
 
-  // Feature cards data
-  const features = [
-    {
-      title: 'Instant Explanations',
-      description: 'Get immediate answers and explanations to any academic question, tailored to your learning level.',
-      icon: <LightBulbIcon className="h-8 w-8 text-indigo-500" />,
-      link: '/search'
-    },
-    {
-      title: 'Practice Problems',
-      description: 'Strengthen your understanding with adaptive practice problems that match your skill level.',
-      icon: <AcademicCapIcon className="h-8 w-8 text-indigo-600" />,
-      link: '/practice'
-    },
-    {
-      title: 'Spaced Repetition',
-      description: 'Never forget what you learn with our scientifically-proven review scheduling system.',
-      icon: <ClockIcon className="h-8 w-8 text-indigo-700" />,
-      link: '/review'
-    },
-    {
-      title: 'Visual Progress',
-      description: 'Track your learning journey with intuitive charts and see your knowledge grow over time.',
-      icon: <ChartBarIcon className="h-8 w-8 text-indigo-800" />,
-      link: '/progress'
-    }
-  ];
-
   return (
-    <div className="min-h-[calc(100vh-200px)]">
-      {/* Hero Section */}
-      <section className={`py-12 px-4 sm:px-6 md:py-20 ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-indigo-50 to-white'} rounded-xl`}>
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className={`text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight ${darkMode ? 'text-white' : 'text-gray-900'} mb-6`}>
-            Learning Made <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">Simple</span>
+    <div className="min-h-[calc(100vh-200px)] space-y-24 pb-12">
+      {/* ─── HERO ─── */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 -z-10">
+          <div className={`absolute inset-0 ${darkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-indigo-50 via-white to-purple-50'}`} />
+          <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-indigo-400/10 blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 rounded-full bg-purple-400/10 blur-3xl" />
+        </div>
+
+        <div className="max-w-5xl mx-auto text-center py-20 md:py-28 px-4">
+          <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-8 ${darkMode ? 'bg-indigo-500/15 text-indigo-400 ring-1 ring-indigo-500/30' : 'bg-indigo-100 text-indigo-700'}`}>
+            <SparklesIcon className="h-4 w-4" />
+            Powered by AI
+          </div>
+
+          <h1 className={`text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            Learning Made{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+              Simple
+            </span>
           </h1>
-          
-          <p className={`max-w-2xl mx-auto text-xl ${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-10`}>
-            Get instant explanations, practice with adaptive problems, and never forget what you've learned with Mastery.ai's personalized learning tools.
+
+          <p className={`max-w-2xl mx-auto text-lg md:text-xl leading-relaxed mb-10 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            Get instant AI explanations, adaptive practice problems, and a spaced-repetition system that ensures you never forget what you learn.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
-              to="/search"
-              className="px-8 py-3 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg"
+              to={user ? '/search' : '/login'}
+              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold hover:from-indigo-700 hover:to-purple-700 shadow-lg shadow-indigo-500/25 transition-all hover:shadow-xl hover:shadow-indigo-500/30 hover:-translate-y-0.5"
             >
-              Ask a Question
+              {user ? 'Ask a Question' : 'Get Started Free'}
+              <ArrowRightIcon className="h-4 w-4" />
             </Link>
             <Link
               to="/practice"
-              className={`px-8 py-3 rounded-lg font-medium ${darkMode 
-                ? 'bg-gray-800 text-white hover:bg-gray-700' 
-                : 'bg-white text-indigo-600 hover:bg-gray-50'} border border-gray-300 shadow-md hover:shadow-lg transition-colors`}
+              className={`inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl font-semibold ring-1 transition-all hover:-translate-y-0.5 ${
+                darkMode
+                  ? 'bg-gray-800 text-white ring-gray-700 hover:bg-gray-750 hover:ring-gray-600'
+                  : 'bg-white text-gray-700 ring-gray-200 hover:bg-gray-50 hover:ring-gray-300 shadow-sm'
+              }`}
             >
-              Practice Now
+              Try Practice
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <h2 className={`text-3xl md:text-4xl font-bold text-center mb-16 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+      {/* ─── FEATURES ─── */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-14">
+          <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
             Everything You Need to Excel
           </h2>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <div 
-                key={index} 
-                className={`p-6 rounded-xl ${darkMode ? 'bg-gray-800 hover:bg-gray-750' : 'bg-white hover:bg-gray-50'} shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1`}
+          <p className={`max-w-2xl mx-auto ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            Five powerful tools designed to help you understand, practice, and retain any subject.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {FEATURES.map((feature) => {
+            const Icon = feature.icon;
+            return (
+              <Link
+                key={feature.title}
+                to={feature.link}
+                className={`group relative p-6 rounded-2xl transition-all duration-300 hover:-translate-y-1 ${
+                  darkMode
+                    ? 'bg-gray-800/50 hover:bg-gray-800 ring-1 ring-gray-800 hover:ring-gray-700'
+                    : 'bg-white hover:bg-white ring-1 ring-gray-100 hover:ring-gray-200 shadow-sm hover:shadow-md'
+                }`}
               >
-                <div className="flex flex-col items-center text-center">
-                  <div className={`p-3 rounded-full ${darkMode ? 'bg-gray-700' : 'bg-indigo-100'} mb-5`}>
-                    {feature.icon}
-                  </div>
-                  <h3 className={`text-xl font-semibold mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                    {feature.title}
-                  </h3>
-                  <p className={`mb-5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                    {feature.description}
-                  </p>
-                  <Link
-                    to={feature.link}
-                    className="text-indigo-500 hover:text-indigo-600 font-medium flex items-center"
-                  >
-                    Try it now
-                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </Link>
+                <div className={`inline-flex p-3 rounded-xl mb-4 ${feature.bg}`}>
+                  <Icon className={`h-6 w-6 bg-gradient-to-br ${feature.color} bg-clip-text`} style={{ color: 'inherit' }} />
                 </div>
+                <h3 className={`text-lg font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {feature.title}
+                </h3>
+                <p className={`text-sm leading-relaxed mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {feature.description}
+                </p>
+                <span className="inline-flex items-center gap-1 text-sm font-medium text-indigo-500 group-hover:text-indigo-400 transition-colors">
+                  Try it
+                  <ArrowRightIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ─── HOW IT WORKS ─── */}
+      <section className={`py-20 -mx-4 px-4 ${darkMode ? 'bg-gray-800/40' : 'bg-gray-50'}`}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              Three Steps to Mastery
+            </h2>
+            <p className={`max-w-xl mx-auto ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              A simple process backed by science to help you learn faster and remember longer.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {STEPS.map((step, i) => (
+              <div key={step.num} className="relative text-center">
+                <div className={`text-5xl font-black mb-4 ${darkMode ? 'text-gray-800' : 'text-gray-100'}`}>
+                  {step.num}
+                </div>
+                <h3 className={`text-xl font-bold mb-3 -mt-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {step.title}
+                </h3>
+                <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {step.desc}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* How it Works Section */}
-      <section className={`py-16 ${darkMode ? 'bg-gray-800' : 'bg-gray-50'} rounded-xl my-16`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <h2 className={`text-3xl md:text-4xl font-bold text-center mb-16 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-            How Mastery.ai Works
+      {/* ─── CTA ─── */}
+      <section className="max-w-3xl mx-auto text-center px-4">
+        <div className={`rounded-3xl p-10 md:p-16 ${darkMode ? 'bg-gradient-to-br from-indigo-600/20 to-purple-600/20 ring-1 ring-indigo-500/20' : 'bg-gradient-to-br from-indigo-600 to-purple-600'}`}>
+          <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-white'}`}>
+            Ready to transform how you learn?
           </h2>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="flex flex-col items-center text-center">
-              <div className={`w-16 h-16 rounded-full ${darkMode ? 'bg-gray-700' : 'bg-indigo-100'} flex items-center justify-center mb-5`}>
-                <span className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-indigo-600'}`}>1</span>
-              </div>
-              <h3 className={`text-xl font-semibold mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                Ask Any Question
-              </h3>
-              <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                Start by typing any academic question you're struggling with. Our AI will understand what you're asking, no matter the subject.
-              </p>
-            </div>
-            
-            <div className="flex flex-col items-center text-center">
-              <div className={`w-16 h-16 rounded-full ${darkMode ? 'bg-gray-700' : 'bg-indigo-100'} flex items-center justify-center mb-5`}>
-                <span className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-indigo-600'}`}>2</span>
-              </div>
-              <h3 className={`text-xl font-semibold mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                Get Personalized Learning
-              </h3>
-              <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                Receive tailored explanations, practice problems, and supporting resources that match your academic level and learning style.
-              </p>
-            </div>
-            
-            <div className="flex flex-col items-center text-center">
-              <div className={`w-16 h-16 rounded-full ${darkMode ? 'bg-gray-700' : 'bg-indigo-100'} flex items-center justify-center mb-5`}>
-                <span className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-indigo-600'}`}>3</span>
-              </div>
-              <h3 className={`text-xl font-semibold mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                Build Lasting Knowledge
-              </h3>
-              <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                Review concepts at optimal intervals with our spaced repetition system, ensuring you retain what you learn for the long term.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      {/* CTA Section */}
-      <section className="py-12 mb-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className={`text-3xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-            Ready to transform your learning experience?
-          </h2>
-          <p className={`mb-8 text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-            Join thousands of students who are already learning more effectively with Mastery.ai.
+          <p className={`mb-8 text-lg ${darkMode ? 'text-indigo-200' : 'text-indigo-100'}`}>
+            Join students who study smarter, not harder, with Mastery.ai.
           </p>
           <Link
-            to="/search"
-            className="px-8 py-4 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
+            to={user ? '/search' : '/login'}
+            className={`inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-semibold transition-all hover:-translate-y-0.5 ${
+              darkMode
+                ? 'bg-white text-indigo-700 hover:bg-gray-100'
+                : 'bg-white text-indigo-700 hover:bg-indigo-50 shadow-lg shadow-indigo-900/20'
+            }`}
           >
             Start Learning Now
+            <ArrowRightIcon className="h-4 w-4" />
           </Link>
         </div>
       </section>
