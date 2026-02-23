@@ -297,12 +297,6 @@ function Search() {
         </div>
 
         <div className="relative max-w-3xl mx-auto px-6">
-          <div className="flex items-center justify-center mb-3">
-            <SparklesIcon className="h-6 w-6 text-indigo-500 mr-2" />
-            <span className={`text-sm font-medium tracking-wide uppercase ${darkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
-              AI-Powered Learning
-            </span>
-          </div>
           <h1 className={`text-3xl md:text-4xl font-extrabold mb-3 text-center leading-tight ${darkMode ? 'text-white' : 'text-gray-900'}`}>
             What do you want to learn?
           </h1>
