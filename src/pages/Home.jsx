@@ -80,11 +80,6 @@ function Home() {
         </div>
 
         <div className="max-w-5xl mx-auto text-center py-20 md:py-28 px-4">
-          <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-8 ${darkMode ? 'bg-indigo-500/15 text-indigo-400 ring-1 ring-indigo-500/30' : 'bg-indigo-100 text-indigo-700'}`}>
-            <SparklesIcon className="h-4 w-4" />
-            Powered by AI
-          </div>
-
           <h1 className={`text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
             Learning Made{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">

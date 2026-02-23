@@ -87,7 +87,7 @@ function Chat() {
         </div>
         <div>
           <h1 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>AI Study Assistant</h1>
-          <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Powered by GPT-4o mini</p>
+          <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Your personal study assistant</p>
         </div>
       </div>
 
