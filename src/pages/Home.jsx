@@ -162,7 +162,7 @@ function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             {STEPS.map((step, i) => (
               <div key={step.num} className="relative text-center">
-                <div className={`text-5xl font-black mb-4 ${darkMode ? 'text-gray-800' : 'text-gray-100'}`}>
+                <div className={`text-5xl font-black mb-4 text-transparent bg-clip-text ${darkMode ? 'bg-gradient-to-b from-white to-gray-800' : 'bg-gradient-to-b from-gray-900 to-gray-300'}`}>
                   {step.num}
                 </div>
                 <h3 className={`text-xl font-bold mb-3 -mt-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
