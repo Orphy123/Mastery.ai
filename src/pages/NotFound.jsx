@@ -8,7 +8,7 @@ function NotFound() {
 
   // Update page title
   React.useEffect(() => {
-    document.title = 'Page Not Found - Mastery.ai';
+    document.title = 'Mastery.AI';
   }, []);
 
   return (

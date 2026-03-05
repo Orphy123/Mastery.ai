@@ -160,7 +160,7 @@ function Search() {
   const { currentUser } = useAuth();
   const { darkMode } = useTheme();
 
-  useEffect(() => { document.title = 'Search & Learn - Mastery.ai'; }, []);
+  useEffect(() => { document.title = 'Mastery.AI'; }, []);
   useEffect(() => { setRecentQueries(getSearchHistory(5)); }, []);
   useEffect(() => {
     if (videos.length > 0 && !activeVideo) setActiveVideo(videos[0]);

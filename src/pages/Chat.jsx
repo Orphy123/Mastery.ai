@@ -22,7 +22,7 @@ function Chat() {
   const { darkMode } = useTheme();
 
   useEffect(() => {
-    document.title = 'Chat - Mastery.ai';
+    document.title = 'Mastery.AI';
   }, []);
 
   useEffect(() => {

@@ -43,7 +43,7 @@ function Practice() {
   
   // Update page title and load from navigation state
   useEffect(() => {
-    document.title = 'Practice Problems - Mastery.ai';
+    document.title = 'Mastery.AI';
     
     // Load user preferences
     const preferences = getPreferences();

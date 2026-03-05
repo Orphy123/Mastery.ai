@@ -34,7 +34,7 @@ function Progress() {
   
   // Update page title
   useEffect(() => {
-    document.title = 'Progress Tracking - Mastery.ai';
+    document.title = 'Mastery.AI';
   }, []);
   
   // Load user data

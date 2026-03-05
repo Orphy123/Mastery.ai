@@ -57,7 +57,7 @@ function Home() {
   const { user } = useAuth();
 
   useEffect(() => {
-    document.title = 'Mastery.ai — Learning Made Simple';
+    document.title = 'Mastery.AI';
   }, []);
 
   return (
